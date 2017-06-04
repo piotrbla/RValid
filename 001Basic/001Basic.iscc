@@ -1,0 +1,18 @@
+R_TILE:= { [0, 1] -> [1, 1] ; [0, 0] -> [0, 1] ; [0, 1] -> [1, 0] ; [0, 0] -> [1, 0] };
+
+##szeregowanie ktore zwraca ISL
+R:= {[i0,i1]-> [i0+i1]: i0,i1>=0};
+
+R_INV:=R^-1;
+
+R_INV;
+
+
+print "R_INV . R_TILE.R";
+R_INV . R_TILE .R;
+
+
+DEL := deltas (R_INV . R_TILE . R);
+print "deltas:";
+print DEL;
+

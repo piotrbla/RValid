@@ -1,0 +1,5 @@
+[n, ii0, ii1] -> { [i0', i1'] -> [i0 = i0', i1 = -i0' + i1'] }
+"R_INV . R_TILE.R"
+[n, ii0, ii1] -> { [i0, i1] -> [o0, o1] : i0 >= 0 and i1 >= i0 and o0 <= 1 + i0 and o0 <= -3 + n - i0 and o1 > i0 + i1 - o0 and o0 <= o1 <= 1 + i1 and o1 <= -2 + n + i0 - i1 + o0 }
+"deltas:"
+[n, ii0, ii1] -> { [i0, i1] : i0 <= 1 and i0 <= -3 + n and -i0 < i1 <= 1 }

@@ -1,0 +1,18 @@
+###R_TILE:= { [0, 1] -> [1, 1] ; [0, 0] -> [0, 1] ; [0, 1] -> [1, 0] ; [0, 0] -> [1, 0] };
+R_TILE := [n] -> { [ii0_prim, ii1_prim] -> [ii0_bis, ii1_bis] : ii0_prim >= 0 and ii1_prim >= 0 and ii0_bis <= 1 + ii0_prim and ii0_bis <= -3 + n - ii0_prim and ii1_bis > 2ii0_prim + ii1_prim - 2ii0_bis and 0 <= ii1_bis <= 1 + ii0_prim + ii1_prim - ii0_bis and ii1_bis <= -2 + n - ii1_prim };
+##szeregowanie ktore zwraca ISL
+###R:= {[i0,i1]-> [i0+i1]: i0,i1>=0};
+R:= [n, ii0, ii1] -> { [i0, i1] -> [i0, i0 + i1] };
+R_INV:=R^-1;
+
+R_INV;
+
+
+print "R_INV . R_TILE.R";
+R_INV . R_TILE .R;
+
+
+DEL := deltas (R_INV . R_TILE . R);
+print "deltas:";
+print DEL;
+
