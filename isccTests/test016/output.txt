@@ -1,0 +1,33 @@
+"P0"
+[N, M] -> { S_6[i, j] : 0 < i <= N and 0 < j <= M }
+"MustW:"
+[N, M] -> { S_6[i, j] -> a[i, j] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M }
+"MayW:"
+[N, M] -> { S_6[i, j] -> a[i, j] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M }
+"MayR:"
+[N, M] -> { S_6[i, j] -> a[-1 + i, -1 + j] : 0 < i <= 7 and i <= N and 0 < j <= 7 and j <= M }
+"P4:"
+domain: "[N, M] -> { S_6[i, j] : 0 < i <= N and 0 < j <= M }"
+child:
+  schedule: "[N, M] -> L_0[{ S_6[i, j] -> [(i)] }]"
+  child:
+    schedule: "[N, M] -> L_1[{ S_6[i, j] -> [(j)] }]"
+
+"Schedule:"
+[N, M] -> { S_6[i, j] -> [i, j] }
+"Tests"
+"Schedule1:"
+[N, M] -> { [S_6[i, j] -> a[i, j]] -> [i, j] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M; [S_6[i, j] -> a[-1 + i, -1 + j]] -> [i, j] : 0 < i <= 7 and i <= N and 0 < j <= 7 and j <= M }
+"Order1:"
+[N, M] -> { [S_6[i, j] -> a[i, j]] -> [S_6[i', j'] -> a[i', j']] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M and i' > i and 0 < i' <= 6 and i' <= N and 0 < j' <= 6 and j' <= M; [S_6[i, j] -> a[-1 + i, -1 + j]] -> [S_6[i', j'] -> a[i', j']] : 0 < i <= 7 and i <= N and 0 < j <= 7 and j <= M and i' > i and 0 < i' <= 6 and i' <= N and 0 < j' <= 6 and j' <= M; [S_6[i, j] -> a[i, j]] -> [S_6[i', j'] -> a[-1 + i', -1 + j']] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M and i' > i and 0 < i' <= 7 and i' <= N and 0 < j' <= 7 and j' <= M; [S_6[i, j] -> a[-1 + i, -1 + j]] -> [S_6[i', j'] -> a[-1 + i', -1 + j']] : 0 < i <= 7 and i <= N and 0 < j <= 7 and j <= M and i' > i and 0 < i' <= 7 and i' <= N and 0 < j' <= 7 and j' <= M; [S_6[i, j] -> a[i, j]] -> [S_6[i' = i, j'] -> a[i, j']] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M and j' > j and 0 < j' <= 6 and j' <= M; [S_6[i, j] -> a[-1 + i, -1 + j]] -> [S_6[i' = i, j'] -> a[i, j']] : 0 < i <= 6 and i <= N and 0 < j <= 7 and j <= M and j' > j and 0 < j' <= 6 and j' <= M; [S_6[i, j] -> a[i, j]] -> [S_6[i' = i, j'] -> a[-1 + i, -1 + j']] : 0 < i <= 6 and i <= N and 0 < j <= 6 and j <= M and j' > j and 0 < j' <= 7 and j' <= M; [S_6[i, j] -> a[-1 + i, -1 + j]] -> [S_6[i' = i, j'] -> a[-1 + i, -1 + j']] : 0 < i <= 7 and i <= N and 0 < j <= 7 and j <= M and j' > j and 0 < j' <= 7 and j' <= M }
+"RAW:"
+[N, M] -> { [S_6[i, j] -> a[i, j]] -> [S_6[i' = 1 + i, j' = 1 + j] -> a[i, j]] : 0 < i <= 6 and i < N and 0 < j <= 6 and j < M }
+"WAW:"
+[N, M] -> {  }
+"Flow:"
+[N, M] -> { [S_6[i, j] -> a[i, j]] -> [S_6[i' = 1 + i, j' = 1 + j] -> a[i, j]] : 0 < i <= 6 and i < N and 0 < j <= 6 and j < M }
+"codegen Schedule1:"
+for (int c0 = 1; c0 <= min(7, N); c0 += 1)
+  for (int c1 = 1; c1 <= min(7, M); c1 += 1)
+    for (int c4 = c0 - 1; c4 <= min(min(6, c0), c0 - c1 + 6); c4 += 1)
+      (c0, c1, c4, -c0 + c1 + c4);

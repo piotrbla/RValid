@@ -1,0 +1,49 @@
+###tu odczyt danych z pliku
+P := parse_file "simpleLoop4.c";
+
+print "Loop domain:";
+LD := P[0];
+print LD;
+
+print "MustW:";
+MustW := P[1];
+print MustW;
+
+print "MayW:";
+MayW := P[2];
+print MayW;
+
+print "MayR:";
+MayR := P[3];
+print MayR;
+
+print "Orginal schedule:";
+OrgSched := P[4];
+print OrgSched;
+
+### DepRel = (W-1 . R) u (W-1 . W) u (R-1 . W) n (OrgSched << OrgSched)
+
+DepRel := ((MustW ^-1 . MayR) + (MustW ^-1 . MustW) + (MustW . MayR^-1)) * (OrgSched << OrgSched);
+print DepRel;
+
+NewSched := schedule LD respecting DepRel minimizing DepRel;
+print "New schedule:";
+print NewSched;
+print "New loops:";
+codegen NewSched;
+
+### ponizsze uzyskane z tc-opt, brakuje użycia TILE
+TILE := [ii0, ii1] -> { [i0, i1] : i0 > 0 and 32ii1 < i1 <= 600 and i1 <= 32 + 32ii1 and ((ii0 <= 17 and ii1 >= 0 and 32ii0 < i0 <= 32 + 32ii0) or (ii0 = 18 and 577 <= i0 <= 600 and i1 > 0)) };
+
+II_SET := { [ii0, ii1] : 0 <= ii0 <= 18 and 0 <= ii1 <= 18 };
+
+R_norm := { [i0, i1] -> [1 + i0, 1 + i1] : 0 < i0 <= 599 and 0 < i1 <= 599 };
+
+R_TILE := { [ii0_prim, ii1_prim] -> [ii0_bis, ii1_bis] : ii0_prim >= 0 and ii1_prim >= 0 and ii0_bis <= 18 and ii0_bis <= 1 + ii0_prim and ii0_prim + ii1_prim - ii0_bis < ii1_bis <= 18 and ii1_bis <= 1 + ii1_prim };
+
+NewSchedR := schedule TILE respecting R_TILE minimizing R_TILE;
+print "NewSchedule based on TILE_R:";
+print NewSchedR;
+
+print "codegen based on TILE_R:";
+codegen NewSchedR;

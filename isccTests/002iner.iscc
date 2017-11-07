@@ -1,0 +1,2 @@
+P := parse_file "rt.c";
+print P[0];

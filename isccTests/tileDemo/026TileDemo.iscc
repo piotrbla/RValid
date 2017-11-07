@@ -1,0 +1,13 @@
+R_TILE:= { [0, 1] -> [1, 1] ; [0, 0] -> [0, 1] ; [0, 1] -> [1, 0] ; [0, 0] -> [1, 0] };
+
+D:= domain R_TILE + range R_TILE;
+
+print "D:";
+print D;
+IslScheduleV := schedule D respecting R_TILE minimizing R_TILE;
+
+print "IslScheduleV";
+print IslScheduleV;
+
+smap := map IslScheduleV;
+print smap;

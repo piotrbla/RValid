@@ -1,0 +1,62 @@
+P := parse_file "my.c";
+
+print "Loop domain:";
+Domain := P[0];
+print Domain;
+
+print "Write:";
+Write := P[1] * Domain;
+print Write;
+
+print "Read:";
+Read := P[3] * Domain;
+print Read;
+
+print "Orginal schedule:";
+Schedule := P[4];
+print Schedule;
+
+### Happens-Before relation without syntactic sugar
+# Lexico := { [i0,i1,i2] -> [o0,o1,o2] : i0 < o0 or i0 = o0 and i1 < o1 or i0 = o0 and i1 = o1 and i2 < o2 };
+# Before := Schedule . Lexico . (Schedule^-1)
+Before := Schedule << Schedule;
+
+print "Before";
+print Before;
+
+RaW := (Write . (Read^-1)) * Before;
+WaW := (Write . (Write^-1)) * Before;
+WaR := (Read . (Write^-1)) * Before;
+
+print "RaW deps";
+print RaW;
+
+print "WaW deps";
+print WaW;
+
+print "WaR deps";
+print WaR;
+
+IslSchedule := schedule Domain respecting (RaW+WaW+WaR) minimizing RaW;
+IslSchedule := IslSchedule + {}; # flatten the schedule tree
+
+print "IslSchedule";
+print IslSchedule;
+
+IslBefore := IslSchedule << IslSchedule;
+
+print "IslBefore";
+print IslBefore;
+
+print "Does IslSchedule respects RaW deps?";
+print RaW <= IslBefore;
+
+print "Does IslSchedule respects WaW deps?";
+print WaW <= IslBefore;
+
+print "Does IslSchedule respects WaR deps?";
+print WaR <= IslBefore;
+
+print "Codegen";
+codegen (IslSchedule * Domain);
+

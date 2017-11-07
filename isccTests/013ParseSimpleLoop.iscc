@@ -1,0 +1,3 @@
+P := parse_file "simpleLoop.c";
+print P[0];
+

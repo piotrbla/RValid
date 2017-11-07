@@ -1,0 +1,35 @@
+"Loop domain:"
+{ U[i, j] : 0 < i <= 600 and 0 < j <= 600 }
+"Write:"
+{ U[i, j] -> a[i, j] : 0 < i <= 600 and 0 < j <= 600 }
+"Read:"
+{ U[i, j] -> a[-1 + i, -1 + j] : 0 < i <= 600 and 0 < j <= 600 }
+"Orginal schedule:"
+domain: "{ U[i, j] : 0 < i <= 600 and 0 < j <= 600 }"
+child:
+  schedule: "L_0[{ U[i, j] -> [(i)] }]"
+  child:
+    schedule: "L_1[{ U[i, j] -> [(j)] }]"
+
+"Before"
+{ U[i, j] -> U[i', j'] : i' > i; U[i, j] -> U[i' = i, j'] : j' > j }
+"RaW deps"
+{ U[i, j] -> U[i' = 1 + i, j' = 1 + j] : 0 < i <= 599 and 0 < j <= 599 }
+"WaW deps"
+{  }
+"WaR deps"
+{  }
+"IslSchedule"
+{ U[i, j] -> [i - j, j] }
+"IslBefore"
+{ U[i, j] -> U[i', j'] : j' < -i + j + i'; U[i, j] -> U[i', j' = -i + j + i'] : i' > i }
+"Does IslSchedule respects RaW deps?"
+True
+"Does IslSchedule respects WaW deps?"
+True
+"Does IslSchedule respects WaR deps?"
+True
+"Codegen"
+for (int c0 = -599; c0 <= 599; c0 += 1)
+  for (int c1 = max(1, -c0 + 1); c1 <= min(600, -c0 + 600); c1 += 1)
+    U(c0 + c1, c1);

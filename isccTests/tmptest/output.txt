@@ -1,0 +1,35 @@
+"Loop domain:"
+[n] -> { S_6[i, j] : 0 < i <= n and 0 < j <= n }
+"Write:"
+[n] -> { S_6[i, j] -> a[i, j] : 0 < i < n and 0 < j < n }
+"Read:"
+[n] -> { S_6[i, j] -> a[1 + i, 1 + j] : 0 < i <= -2 + n and 0 < j <= -2 + n; S_6[i, j] -> a[1 + i, -1 + j] : 0 < i <= -2 + n and 0 < j <= n }
+"Orginal schedule:"
+domain: "[n] -> { S_6[i, j] : 0 < i <= n and 0 < j <= n }"
+child:
+  schedule: "[n] -> L_0[{ S_6[i, j] -> [(i)] }]"
+  child:
+    schedule: "[n] -> L_1[{ S_6[i, j] -> [(j)] }]"
+
+"Before"
+[n] -> { S_6[i, j] -> S_6[i', j'] : i' > i; S_6[i, j] -> S_6[i' = i, j'] : j' > j }
+"RaW deps"
+[n] -> {  }
+"WaW deps"
+[n] -> {  }
+"WaR deps"
+[n] -> { S_6[i, j] -> S_6[i' = 1 + i, j' = 1 + j] : 0 < i <= -2 + n and 0 < j <= -2 + n; S_6[i, j] -> S_6[i' = 1 + i, j' = -1 + j] : 0 < i <= -2 + n and 2 <= j <= n }
+"IslSchedule"
+[n] -> { S_6[i, j] -> [i, i + j] }
+"IslBefore"
+[n] -> { S_6[i, j] -> S_6[i', j'] : i' > i; S_6[i, j] -> S_6[i' = i, j'] : j' > j }
+"Does IslSchedule respects RaW deps?"
+True
+"Does IslSchedule respects WaW deps?"
+True
+"Does IslSchedule respects WaR deps?"
+True
+"Codegen"
+for (int c0 = 1; c0 <= n; c0 += 1)
+  for (int c1 = c0 + 1; c1 <= n + c0; c1 += 1)
+    S_6(c0, -c0 + c1);

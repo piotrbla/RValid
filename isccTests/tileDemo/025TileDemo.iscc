@@ -1,0 +1,21 @@
+R_TILE := [n] -> { [ii0_prim, ii1_prim] -> [ii0_bis, ii1_bis] : ii0_prim >= 0 and ii1_prim >= 0 and ii0_bis <= 1 + ii0_prim and ii0_bis <= -3 + n - ii0_prim and ii1_bis > 2ii0_prim + ii1_prim - 2ii0_bis and 0 <= ii1_bis <= 1 + ii0_prim + ii1_prim - ii0_bis and ii1_bis <= -2 + n - ii1_prim };
+
+TILE_VLD := [n, ii0, ii1] -> { [i0, i1] : ii0 >= 0 and 2ii0 < i0 <= n and i1 > 2ii1 and ((ii1 >= 0 and 2ii1 <= -3 + n and i0 < n and i1 <= 3 + 2ii0 + 2ii1 - i0) or (2ii1 >= -2 + n and i0 <= 2 + 2ii0 and i1 <= n)); [2 + 2ii0, 2ii1] : ii0 >= 0 and 2ii0 <= -3 + n and ii1 > 0 and 2ii1 < n; [n, i1] : -2 + n <= 2ii0 < n and ii1 >= 0 and 2ii1 <= -3 + n and 2ii1 < i1 <= 2 + 2ii1 };
+
+TILE := [n, ii0, ii1] -> { [i0, i1] : ii0 >= 0 and ii1 >= 0 and 2ii0 < i0 <= 2 + 2ii0 and i0 <= n and 2ii1 < i1 <= 2 + 2ii1 and i1 <= n };
+
+
+IslScheduleT := schedule TILE respecting R_TILE minimizing R_TILE;
+IslScheduleV := schedule TILE_VLD respecting R_TILE minimizing R_TILE;
+print "IslScheduleT";
+print IslScheduleT;
+map IslScheduleT;
+
+print "IslScheduleV";
+print IslScheduleV;
+
+print "Codegen TILE:";
+codegen IslScheduleT;
+
+print "Codegen TILE_VLD:";
+codegen IslScheduleV;

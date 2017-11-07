@@ -1,0 +1,39 @@
+P := parse_file "simpleLoop2.c";
+print "P0";
+print P[0];
+print "MustW:";
+print P[1];
+print "MayW:";
+print P[2];
+print "MayR:";
+print P[3];
+
+print "P4:";
+print P[4];
+S := map P[4];
+print "Schedule:";
+print S;
+print "PALL";
+print P;
+
+print "Tests";
+Write := P[2];
+Read := P[3];
+Write1 := range_map Write ;
+Read1 := range_map Read ;
+
+Schedule1 := ( domain_map ( Read + Write )) . S ;
+print Write1;
+print Read1;
+print Schedule1;
+
+Order1 := Schedule1 << Schedule1 ;
+RAW := ( Write1 . Read1 ^-1) * Order1 ;
+WAW := ( Write1 . Write1 ^-1) * Order1 ;
+Flow := RAW - (WAW . RAW );
+print Order1;
+print RAW;
+print WAW;
+print Flow;
+
+codegen Schedule1;

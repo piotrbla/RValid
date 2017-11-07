@@ -1,0 +1,76 @@
+P := parse_file "my.c";
+
+print "Loop domain:";
+Domain := P[0];
+print Domain;
+
+print "Write:";
+Write := P[1] * Domain;
+print Write;
+
+print "Read:";
+Read := P[3] * Domain;
+print Read;
+
+print "Orginal schedule:";
+Schedule := P[4];
+print Schedule;
+
+### Happens-Before relation without syntactic sugar
+# Lexico := { [i0,i1,i2] -> [o0,o1,o2] : i0 < o0 or i0 = o0 and i1 < o1 or i0 = o0 and i1 = o1 and i2 < o2 };
+# Before := Schedule . Lexico . (Schedule^-1)
+Before := Schedule << Schedule;
+
+print "Before";
+print Before;
+
+RaW := (Write . (Read^-1)) * Before;
+WaW := (Write . (Write^-1)) * Before;
+WaR := (Read . (Write^-1)) * Before;
+
+print "RaW deps";
+print RaW;
+
+print "WaW deps";
+print WaW;
+
+print "WaR deps";
+print WaR;
+
+IslSchedule := schedule Domain respecting (RaW+WaW+WaR) minimizing RaW;
+IslSchedule := IslSchedule + {}; # flatten the schedule tree
+
+print "IslSchedule";
+print IslSchedule;
+
+IslBefore := IslSchedule << IslSchedule;
+
+print "IslBefore";
+print IslBefore;
+
+print "Does IslSchedule respects RaW deps?";
+print RaW <= IslBefore;
+
+print "Does IslSchedule respects WaW deps?";
+print WaW <= IslBefore;
+
+print "Does IslSchedule respects WaR deps?";
+print WaR <= IslBefore;
+
+print "Codegen";
+codegen (IslSchedule * Domain);
+
+TILE := [n, ii0, ii1] -> { [i0, i1] : ii0 >= 0 and ii1 >= 0 and 32ii0 < i0 <= 32 + 32ii0 and i0 <= n and 32ii1 < i1 <= 32 + 32ii1 and i1 <= n };
+
+II_SET := [n] -> { [ii0, ii1] : n > 0 and ii0 >= 0 and 32ii0 < n and ii1 >= 0 and 32ii1 < n };
+
+R_norm := [n] -> { [i0, i1] -> [1 + i0, 1 + i1] : 0 < i0 <= -2 + n and 0 < i1 <= -2 + n; [i0, i1] -> [1 + i0, -1 + i1] : 0 < i0 <= -2 + n and 2 <= i1 <= n };
+
+R_TILE := [n] -> { [ii0_prim, ii1_prim] -> [ii0_bis, ii1_bis] : ii0_prim >= 0 and ii0_bis <= 1 + ii0_prim and 32ii0_bis <= -2 + n and ((32ii0_prim <= -3 + n and ii1_bis >= -1 + ii1_prim and 0 <= ii1_bis < -ii0_prim + ii1_prim + ii0_bis and ii1_bis <= -2 + n - 31ii1_prim) or (ii1_prim >= 0 and ii0_prim + ii1_prim - ii0_bis < ii1_bis <= 1 + ii1_prim and 34 - n + 32ii0_prim + 31ii1_prim <= 31ii1_bis <= -3 + n - ii1_prim)) };
+
+IslScheduleT := schedule TILE respecting R_TILE minimizing R_norm;
+
+IslScheduleT := IslScheduleT + {}; # flatten the schedule tree
+
+print "IslScheduleT";
+print IslScheduleT;

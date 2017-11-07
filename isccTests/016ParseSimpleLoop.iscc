@@ -1,0 +1,64 @@
+###tu odczyt danych z pliku
+P := parse_file "simpleLoop2.c";
+print "P0";
+###tu wypisujmy domene
+LD := P[0];
+print LD;
+print "MustW:";
+###tu wypisujemy relacje zapisu
+print P[1];
+print "MayW:";
+###tu wypisujemy możliwe relacje zapisu
+print P[2];
+print "MayR:";
+###tu wypisujemy możliwe odczyty
+print P[3];
+
+print "P4:";
+###tu wypisujemy domene wraz z wszystkimi gałęziami szeregowania
+print P[4];
+
+###tu jest operacja, co do ktorej mam watpliwości, na obecną chwilę jednak jest to jedyny sposób
+### na wyciągnięcie wspólnej informacji z obydwu gałęzi szeregowania
+S := map P[4];
+print "Schedule:";
+print S;
+print "Tests";
+Write := P[2];
+Read := P[3];
+Write1 := range_map Write ;
+Read1 := range_map Read ;
+###to sposób na wyciągnięcie szeregowania zaczerpnięty z instrukcji do iscc i polycomp (polycomp-tutorial-v0.02.pdf)
+Schedule1 := ( domain_map ( Read + Write )) . S ;
+print "Schedule1:";
+print Schedule1;
+###tu jest wyciągana kolejność wykonywania iteracji na podstawie Schedule1 - to inna forma zapisu tej samej informacji
+Order1 := Schedule1 << Schedule1 ;
+###tu są wyciągane zależności Read after Write
+RAW := ( Write1 . Read1 ^-1) * Order1 ;
+###tu są wyciągane zależności Write after Write (w tym przypadku puste)
+WAW := ( Write1 . Write1 ^-1) * Order1 ;
+###tu jest jeszcze inna forma zapisu kolejności wykonywania 
+Flow := RAW - (WAW . RAW );
+
+
+newS := schedule LD respecting RAW minimizing RAW;
+print "newS:";
+print newS;
+
+newSM := map newS;
+print "newSM:";
+print newSM;
+
+print "Order1:";
+print Order1;
+print "RAW:";
+print RAW;
+print "WAW:";
+print WAW;
+print "Flow:";
+print Flow;
+
+print "codegen Schedule1:";
+codegen Schedule1;
+

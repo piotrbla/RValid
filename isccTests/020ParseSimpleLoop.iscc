@@ -1,0 +1,40 @@
+###tu odczyt danych z pliku
+P := parse_file "simpleLoop3.c";
+
+print "Loop domain:";
+###tu wypisujmy domene
+LD := P[0];
+print LD;
+
+print "MustW:";
+###tu wypisujemy relacje zapisu
+MustW := P[1];
+print MustW;
+
+print "MayW:";
+###tu wypisujemy możliwe relacje zapisu
+MayW := P[2];
+print MayW;
+
+print "MayR:";
+###tu wypisujemy możliwe odczyty
+MayR := P[3];
+print MayR;
+
+print "Orginal schedule:";
+###tu wypisujemy domene wraz z wszystkimi gałęziami szeregowania oryginalnego
+OrgSched := P[4];
+print OrgSched;
+
+### DepRel = (W-1 . R) u (W-1 . W) u (R-1 . W) n (OrgSched << OrgSched)
+
+DepRel := ((MustW ^-1 . MayR) + (MustW ^-1 . MustW) + (MustW . MayR^-1)) * (OrgSched << OrgSched);
+print DepRel;
+
+NewSched := schedule LD respecting DepRel minimizing DepRel;
+### tu wypisujemy nowe szeregowanie i generujuemy kod
+print "New schedule:";
+print NewSched;
+print "New loops:";
+codegen NewSched;
+

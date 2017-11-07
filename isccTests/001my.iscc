@@ -1,0 +1,2 @@
+P := parse_file "file.c";
+print P[0];

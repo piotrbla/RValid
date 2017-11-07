@@ -1,0 +1,35 @@
+"IslScheduleT"
+domain: "[n, ii0, ii1] -> { [i0, i1] : ii0 >= 0 and ii1 >= 0 and 2ii0 < i0 <= 2 + 2ii0 and i0 <= n and 2ii1 < i1 <= 2 + 2ii1 and i1 <= n }"
+child:
+  schedule: "[n, ii0, ii1] -> [{ [i0, i1] -> [(i0)] }, { [i0, i1] -> [(i0 + i1)] }]"
+  permutable: 1
+  coincident: [ 1, 1 ]
+
+"IslScheduleV"
+domain: "[n, ii0, ii1] -> { [i0, i1] : ii0 >= 0 and 2ii0 < i0 <= n and i1 > 2ii1 and ((ii1 >= 0 and 2ii1 <= -3 + n and i0 < n and i1 <= 3 + 2ii0 + 2ii1 - i0) or (2ii1 >= -2 + n and i0 <= 2 + 2ii0 and i1 <= n)); [i0 = 2 + 2ii0, i1 = 2ii1] : ii0 >= 0 and 2ii0 <= -3 + n and ii1 > 0 and 2ii1 < n; [i0 = n, i1] : -2 + n <= 2ii0 < n and ii1 >= 0 and 2ii1 <= -3 + n and 2ii1 < i1 <= 2 + 2ii1 }"
+child:
+  schedule: "[n, ii0, ii1] -> [{ [i0, i1] -> [(i0)] }, { [i0, i1] -> [(i0 + i1)] }]"
+  permutable: 1
+  coincident: [ 1, 1 ]
+
+"Codegen TILE:"
+if (ii0 >= 0 && ii1 >= 0)
+  for (int c0 = 2 * ii0 + 1; c0 <= min(n, 2 * ii0 + 2); c0 += 1)
+    for (int c1 = 2 * ii1 + c0 + 1; c1 <= min(n + c0, 2 * ii1 + c0 + 2); c1 += 1)
+      (c0, -c0 + c1);
+"Codegen TILE_VLD:"
+if (ii0 >= 0 && ii1 >= 0 && n >= 2 * ii1 + 1)
+  for (int c0 = 2 * ii0 + 1; c0 <= min(n, 2 * ii0 + 2); c0 += 1) {
+    if (n >= 2 * ii0 + 3 && ii1 >= 1 && c0 == 2 * ii0 + 2)
+      (2 * ii0 + 2, 2 * ii1);
+    if (2 * ii1 + 2 >= n) {
+      for (int c1 = 2 * ii1 + c0 + 1; c1 <= n + c0; c1 += 1)
+        (c0, -c0 + c1);
+    } else if (n >= c0 + 1) {
+      for (int c1 = 2 * ii1 + c0 + 1; c1 <= 2 * ii0 + 2 * ii1 + 3; c1 += 1)
+        (c0, -c0 + c1);
+    }
+    if (n >= 2 * ii1 + 3 && c0 == n)
+      for (int c1 = n + 2 * ii1 + 1; c1 <= n + 2 * ii1 + 2; c1 += 1)
+        (n, -n + c1);
+  }
